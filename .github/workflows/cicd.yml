@@ -19,9 +19,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  maven:
-    name: Java CI with Maven
-    uses: ./.github/workflows/maven.yml
     
   gitguardian:
     name: GitGuardian scan
