@@ -19,6 +19,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  maven:
+    name: Java CI with Maven
+    uses: ./.github/workflows/maven.yml
+    
   gitguardian:
     name: GitGuardian scan
     if: github.event_name == 'pull_request' && github.event.action == 'synchronize' || contains(github.event.head_commit.message, 'task completed') || contains(github.event.head_commit.message, 'issue resolved')
