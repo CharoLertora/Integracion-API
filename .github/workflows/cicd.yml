@@ -42,21 +42,3 @@ jobs:
     name: Update diagram
     if: github.event.pull_request.merged == true
     uses: ./.github/workflows/repo_visualizer.yml
-
-  release:
-    name: Create release
-    if: github.event.pull_request.merged == true
-    needs: [repo_visualizer]
-    uses: ./.github/workflows/release.yml
-
-  build_and_push_to_registry:
-    name: Build and push Docker image to GitHub Packages
-    if: github.event.pull_request.merged == true
-    needs: [release]
-    uses: ./.github/workflows/build.yml
-
-  trivy_scan:
-    name: Trivy image scan
-    if: github.event.pull_request.merged == true
-    needs: [build_and_push_to_registry]
-    uses: ./.github/workflows/trivy-image.yml
