@@ -26,6 +26,7 @@ jobs:
         distribution: 'temurin'
         
     - name: Cache Maven Packages
+      uses: actions/cache@v2
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
