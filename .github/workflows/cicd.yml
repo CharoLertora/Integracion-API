@@ -43,10 +43,9 @@ jobs:
       runs-on: ubuntu-latest
       environment: production
       steps:
-        - name: Iniciar agente SSH y agregar clave privada
+        - name: Iniciar agente SSH
           run: |
             eval `ssh-agent -s`
-            ssh-add ~/.ssh/integracion_api.pem
         - name: Configurar git y desbloquear clave privada
           run: |
             mkdir -p ~/.ssh
