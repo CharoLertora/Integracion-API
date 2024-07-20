@@ -43,19 +43,40 @@ jobs:
       runs-on: ubuntu-latest
       environment: production
       steps:
-        - name: Deploy to AWS
+        - name: Iniciar agente SSH y agregar clave privada
+          run: |
+            eval `ssh-agent -s`
+            ssh-add ~/.ssh/integracion_api.pem
+        - name: Configurar git y desbloquear clave privada
+          run: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/integracion_api.pem
+            chmod 600 ~/.ssh/integracion_api.pem
+            ssh-add ~/.ssh/integracion_api.pem
+  
+        - name: Clonar repositorio y realizar despliegue
+          run: |
+            git clone git@github.com:CharoLertora/Integracion-API.git
+          # Comandos para desplegar la aplicación en el servidor AWS
+        - name: Set up AWS credentials
           env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: |
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set default.region us-east-1
+        - name: Deploy to AWS
+          env:
             EC2_HOST: ${{ secrets.EC2_HOST }}
             EC2_USER: ${{ secrets.EC2_USER }}
             EC2_KEY: ${{ secrets.EC2_KEY }}
           run: |
-            echo "${{ secrets.EC2_KEY }}" > Pipline_DigitalNao.pem
-            chmod 400 C:/Users/charo/Cursos/Credenciales-AWS/Pipline_DigitalNao.pem
-            scp -o StrictHostKeyChecking=no -i C:/Users/charo/Cursos/Credenciales-AWS/Pipline_DigitalNao.pem target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
-            ssh -o StrictHostKeyChecking=no -i C:/Users/charo/Cursos/Credenciales-AWS/Pipline_DigitalNao.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "${{ secrets.EC2_KEY }}" > integracion_api.pem
+            chmod 400 integracion_api.pem
+            scp -o StrictHostKeyChecking=no -i integracion_api.pem target/*.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app.jar
+            ssh -o StrictHostKeyChecking=no -i integracion_api.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
               pkill -f 'java -jar' || true
               nohup java -jar /home/${{ secrets.EC2_USER }}/app.jar > /dev/null 2>&1 &
             EOF
-            rm C:/Users/charo/Cursos/Credenciales-AWS/Pipline_DigitalNao.pem
+            rm integracion_api.pem
