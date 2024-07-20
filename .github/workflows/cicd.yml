@@ -48,7 +48,6 @@ jobs:
             eval `ssh-agent -s`
         - name: Configurar git y desbloquear clave privada
           run: |
-            mkdir -p ~/.ssh
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/integracion_api.pem
             chmod 600 ~/.ssh/integracion_api.pem
             ssh-add ~/.ssh/integracion_api.pem
